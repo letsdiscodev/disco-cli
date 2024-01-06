@@ -29,10 +29,10 @@ def init_command(ssh: str, verbose: bool) -> None:
     command = "curl https://downloads.letsdisco.dev/latest/init | sudo sh"
     success, output = _ssh_command(connection_str=ssh, command=command, verbose=verbose)
     if not success:
-        click.echo("Failed")
         click.echo(output)
+        click.echo("Failed")
         return
     else:
-        click.echo("Success")
         click.echo(output)
+        click.echo("Success")
         return
