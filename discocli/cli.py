@@ -26,3 +26,21 @@ def init(ssh: str, verbose: bool) -> None:
     from discocli.commands.init import init_command
 
     init_command(ssh=ssh, verbose=verbose)
+
+
+@main.command(name="projects:add")
+@click.option(
+    "--ssh",
+    required=True,
+    help="user@host, e.g. root@123.123.123.123",
+)
+@click.option(
+    "--verbose",
+    default=False,
+    show_default=True,
+    help="Make the operation more talkative",
+)
+def projects_add(ssh: str, verbose: bool) -> None:
+    from discocli.commands.projects.add import add_command
+
+    add_command(ssh=ssh, verbose=verbose)
