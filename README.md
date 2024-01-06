@@ -12,6 +12,6 @@ $ pip install --editable .
 
 Test that it works
 ```bash
-$ disco
-It works!
+$ disco --version
+disco-cli 0.1.0
 ```
