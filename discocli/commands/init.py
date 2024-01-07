@@ -1,6 +1,9 @@
+import re
 import subprocess
 
 import click
+
+from discocli.config import set_api_key
 
 INIT_SCRIPT_URL = "https://downloads.letsdisco.dev/latest/init"
 
@@ -29,6 +32,8 @@ def init(ssh: str, disco_domain: str) -> None:
         return
     else:
         click.echo(output)
+        api_key = _extract_api_key(output)
+        set_api_key(disco_domain=disco_domain, api_key=api_key)
         click.echo("Success")
         return
 
@@ -50,3 +55,9 @@ def _ssh_command(connection_str: str, command: str) -> tuple[bool, str]:
     except subprocess.CalledProcessError as ex:
         return False, ex.stdout.decode("utf-8")
     return True, result.stdout.decode("utf-8")
+
+
+def _extract_api_key(output: str) -> str:
+    match = re.search(r"Created API key: (?P<api_key>[a-z0-9]{32})", output)
+    api_key = match.group("api_key")
+    return api_key
