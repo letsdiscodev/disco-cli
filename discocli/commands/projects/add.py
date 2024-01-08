@@ -42,3 +42,6 @@ def projects_add(name: str, domain: str, github_repo: str, disco_domain: str | N
     if response.status_code != 201:
         click.echo("Error")
         click.echo(response.text)
+    resp_body = response.json()
+    click.echo("Create a Deploy Key on Github with this:")
+    click.echo(resp_body["sshKeyPub"])
