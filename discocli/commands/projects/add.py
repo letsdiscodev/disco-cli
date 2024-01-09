@@ -45,3 +45,7 @@ def projects_add(name: str, domain: str, github_repo: str, disco_domain: str | N
     resp_body = response.json()
     click.echo("Create a Deploy Key on Github with this:")
     click.echo(resp_body["sshKeyPub"])
+    click.echo("")
+    click.echo("Then add a Github webhook for pushes to that URL, "
+               "with 'Content-Type: application/json':")
+    click.echo(f"https://{disco_domain}/webhooks/github/{resp_body['project']['id']}")
