@@ -8,6 +8,9 @@ from discocli.commands.envvariables.set import env_var_set
 from discocli.commands.envvariables.get import env_var_get
 from discocli.commands.envvariables.delete import env_var_delete
 from discocli.commands.envvariables.list import env_var_list
+from discocli.commands.volumes.add import volumes_add
+from discocli.commands.volumes.list import volumes_list
+from discocli.commands.volumes.delete import volumes_delete
 
 
 @click.group()
@@ -27,3 +30,6 @@ main.add_command(env_var_set)
 main.add_command(env_var_get)
 main.add_command(env_var_delete)
 main.add_command(env_var_list)
+main.add_command(volumes_add)
+main.add_command(volumes_list)
+main.add_command(volumes_delete)
