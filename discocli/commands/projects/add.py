@@ -11,12 +11,12 @@ from discocli import config
 )
 @click.option(
     "--domain",
-    required=True,
+    required=False,
     help="domain name where the app will be served, e.g. www.example.com",
 )
 @click.option(
     "--github-repo",
-    required=True,
+    required=False,
     help="URL used to clone the repo, e.g. git@github.com:example/example.git",
 )
 @click.option(
