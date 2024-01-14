@@ -17,6 +17,11 @@ from discocli import config
     help="the port on the container you want to publis on the host",
 )
 @click.option(
+    "--protocol",
+    required=True,
+    help="the protocol, e.g. tcp or udp",
+)
+@click.option(
     "--project",
     required=True,
     help="the name of the project",
@@ -26,7 +31,7 @@ from discocli import config
     required=False,
     help="The domain where Disco is running",
 )
-def publishedports_add(host_port: int, container_port: int, project: str, disco_domain: str | None) -> None:
+def publishedports_add(host_port: int, container_port: int, protocol: str, project: str, disco_domain: str | None) -> None:
     disco_domain_config = config.get_disco_domain(disco_domain)
     disco_domain = disco_domain_config["domain"]
     click.echo(f"Adding published port")
@@ -34,6 +39,7 @@ def publishedports_add(host_port: int, container_port: int, project: str, disco_
     req_body = dict(
         hostPort=host_port,
         containerPort=container_port,
+        protocol=protocol,
     )
     response = requests.post(url,
         json=req_body,

@@ -21,9 +21,10 @@ INIT_SCRIPT_URL = "https://downloads.letsdisco.dev/latest/init"
 )
 def init(ssh: str, disco_domain: str) -> None:
     click.echo(f"Installing Disco on {ssh}")
+    _, disco_ip = ssh.split("@")
     command = (
         f"curl {INIT_SCRIPT_URL} | "
-        f"sudo DISCO_DOMAIN={disco_domain} sh"
+        f"sudo DISCO_DOMAIN={disco_domain} DISCO_IP={disco_ip} sh"
     )
     success, output = _ssh_command(connection_str=ssh, command=command)
     if not success:

@@ -11,6 +11,11 @@ from discocli import config
     help="the port on the host that will be public on the machine",
 )
 @click.option(
+    "--protocol",
+    required=True,
+    help="the protocol, e.g. tcp or udp",
+)
+@click.option(
     "--project",
     required=True,
     help="the name of the project",
@@ -20,11 +25,11 @@ from discocli import config
     required=False,
     help="The domain where Disco is running",
 )
-def publishedports_remove(host_port: int, project: str, disco_domain: str | None) -> None:
+def publishedports_remove(host_port: int, protocol: str, project: str, disco_domain: str | None) -> None:
     disco_domain_config = config.get_disco_domain(disco_domain)
     disco_domain = disco_domain_config["domain"]
     click.echo(f"Removing published port")
-    url = f"https://{disco_domain}/projects/{project}/published-ports/{host_port}"
+    url = f"https://{disco_domain}/projects/{project}/published-ports/{host_port}/{protocol}"
     response = requests.delete(url,
         auth=(disco_domain_config["apiKey"], ""),
         headers={"Accept": "application/json"},
