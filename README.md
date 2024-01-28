@@ -2,7 +2,7 @@
 
 ## Usage
 
-### Install Disco on a Ubuntu 23.04 server with first project
+### Install Disco on a Ubuntu 23.10 server with first project
 
 #### Install Disco on server
 
