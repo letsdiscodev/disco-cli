@@ -86,6 +86,11 @@ disco deploy \
 disco logs --project first-project
 ```
 
+#### Setup logging on a third party service
+
+```bash
+disco syslog:add syslog+tls://logsN.papertrailapp.com:12345
+```
 
 ## Local development
 

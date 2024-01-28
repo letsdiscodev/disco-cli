@@ -9,6 +9,9 @@ from discocli.commands.envvariables.get import env_var_get
 from discocli.commands.envvariables.delete import env_var_delete
 from discocli.commands.envvariables.list import env_var_list
 from discocli.commands.logs import logs
+from discocli.commands.syslog.add import syslog_add
+from discocli.commands.syslog.remove import syslog_remove
+from discocli.commands.syslog.list import syslog_list
 
 
 @click.group()
@@ -29,3 +32,6 @@ main.add_command(env_var_get)
 main.add_command(env_var_delete)
 main.add_command(env_var_list)
 main.add_command(logs)
+main.add_command(syslog_add)
+main.add_command(syslog_remove)
+main.add_command(syslog_list)
