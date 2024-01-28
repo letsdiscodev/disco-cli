@@ -36,7 +36,7 @@ def logs(disco_domain: str | None, project: str | None, service: str | None) -> 
             log_item = json.loads(log_json_str)
             if "com.docker.swarm.service.name" not in log_item["labels"]:
                 continue
-            service = log_item["labels"]["com.docker.swarm.service.name"]
+            container = log_item["container"][1:]
             timestamp = log_item["timestamp"]
             message = log_item["message"]
-            click.echo(f"{service} {timestamp} {message}")
+            click.echo(f"{container} {timestamp} {message}")
