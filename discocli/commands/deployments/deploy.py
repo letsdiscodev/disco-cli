@@ -1,5 +1,8 @@
+import json
+
 import click
 import requests
+import sseclient
 
 from discocli import config
 
@@ -46,4 +49,14 @@ def deploy(name: str, commit: str, file: str, disco_domain: str | None) -> None:
         click.echo("Error")
         click.echo(response.text)
     resp_body = response.json()
-    click.echo(f"Deployed {name}, version {resp_body['deployment']['number']}")
+    click.echo(f"Deploying {name}, version {resp_body['deployment']['number']}")
+    url = f"https://{disco_domain}/projects/{name}/deployments/{resp_body['deployment']['number']}/output"
+    response = requests.get(url,
+        auth=(disco_domain_config["apiKey"], ""),
+        headers={'Accept': 'text/event-stream'},
+        stream=True,
+    )
+    for event in sseclient.SSEClient(response).events():
+        output = json.loads(event.data)
+        click.echo(output["text"], nl=False)
+

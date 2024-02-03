@@ -9,6 +9,7 @@ setup(
         'Click',
         'requests',
         'websockets',
+        'sseclient-py'
     ],
     entry_points={
         'console_scripts': [
