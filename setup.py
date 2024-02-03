@@ -8,7 +8,6 @@ setup(
     install_requires=[
         'Click',
         'requests',
-        'websockets',
         'sseclient-py'
     ],
     entry_points={
