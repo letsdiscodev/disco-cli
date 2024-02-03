@@ -28,11 +28,9 @@ def init(ssh: str, disco_domain: str) -> None:
     )
     success, output = _ssh_command(connection_str=ssh, command=command)
     if not success:
-        click.echo(output)
         click.echo("Failed")
         return
     else:
-        click.echo(output)
         api_key = _extract_api_key(output)
         set_api_key(disco_domain=disco_domain, api_key=api_key)
         click.echo("Success")
@@ -40,22 +38,22 @@ def init(ssh: str, disco_domain: str) -> None:
 
 
 def _ssh_command(connection_str: str, command: str) -> tuple[bool, str]:
-    try:
-        args = [
-            "ssh",
-            connection_str,
-            "bash -s",
-        ]
-        result = subprocess.run(
-            args=args,
-            check=True,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-            input=command.encode("utf-8"),
-        )
-    except subprocess.CalledProcessError as ex:
-        return False, ex.stdout.decode("utf-8")
-    return True, result.stdout.decode("utf-8")
+    args = [
+        "ssh",
+        connection_str,
+        command,
+    ]
+    process = subprocess.Popen(
+        args=args,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+    )
+    output = ""
+    for line in process.stdout:
+        print(line.decode("utf-8"), end="")
+        output += line.decode("utf-8")
+    process.wait()
+    return process.returncode == 0, output
 
 
 def _extract_api_key(output: str) -> str:
