@@ -7,22 +7,22 @@
 #### Install Disco on server
 
 ```bash
-disco init \
-    --ssh root@123.123.123.123
-    --disco-domain disco.example.com
+disco init root@123.123.123.123
 ```
 
 #### Add Postgres
 
+This is a temporary way of adding postgres until we polish it a bit.
+
 ```bash
 disco projects:add --name postgres-project
 disco env:set \
-    --name postgres-project \
+    --project postgres-project \
     POSTGRES_PASSWORD=Password1 \
     PGDATA=/var/lib/postgresql/data/pgdata
-# temporary hack, see below for content of postgres.json file
+# see below for content of postgres.json file
 disco deploy \
-    --name postgres-project \
+    --project postgres-project \
     --file postgres.json
 ```
 
@@ -53,7 +53,7 @@ Here's the content of `postgres.json`:
 
 ```bash
 # use SQL client to run some SQL
-pgcli postgres://postgres:Password1@disco.example.com/postgres
+pgcli postgres://postgres:Password1@123.123.123.123/postgres
 ```
 
 ```sql
@@ -61,22 +61,20 @@ pgcli postgres://postgres:Password1@disco.example.com/postgres
 CREATE TABLE page_views (id SERIAL, count INTEGER);
 ```
 
-
-#### Add web project with worker
+#### Add project
 
 ```bash
 disco projects:add \
     --name first-project \
-    --github-repo \
-    git@github.com:exampleuser/examplerepo.git \
+    --github-repo git@github.com:exampleuser/examplerepo.git \
     --domain app.example.com
 # use output from command above to set deploy key and webhook in Github
 disco env:set \
-    --name first-project \
-    DATABASE_URL=postgresql+psycopg2://postgres:Password1@disco.example.com/postgres
+    --project first-project \
+    DATABASE_URL=postgresql+psycopg2://postgres:Password1@123.123.123.123/postgres
 # git push to repo or deploy using this command:
 disco deploy \
-    --name first-project \
+    --project first-project \
     --commit 999ae33ccdf2cf849f3fc9af5fe9443699265be4
 ```
 

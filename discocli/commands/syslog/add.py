@@ -5,26 +5,26 @@ from discocli import config
 
 @click.command(name="syslog:add")
 @click.option(
-    "--disco-domain",
+    "--disco",
     required=False,
-    help="The domain where Disco is running",
+    help="The Disco to use",
 )
 @click.argument(
     "url",
 )
-def syslog_add(url: str, disco_domain: str | None) -> None:
-    disco_domain_config = config.get_disco_domain(disco_domain)
-    disco_domain = disco_domain_config["domain"]
+def syslog_add(url: str, disco: str | None) -> None:
+    disco_config = config.get_disco(disco)
     click.echo(f"Adding Syslog URL")
-    request_url = f"https://{disco_domain}/syslog"
+    request_url = f"https://{disco_config['host']}/.disco/syslog"
     req_body = dict(
         action="add",
         url=url,
     )
     response = requests.post(request_url,
         json=req_body,
-        auth=(disco_domain_config["apiKey"], ""),
+        auth=(disco_config["apiKey"], ""),
         headers={"Accept": "application/json"},
+        verify=config.requests_verify(disco_config),
     )
     if response.status_code != 200:
         click.echo("Error")

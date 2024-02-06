@@ -5,18 +5,18 @@ from discocli import config
 
 @click.command(name="projects:list")
 @click.option(
-    "--disco-domain",
+    "--disco",
     required=False,
-    help="The domain where Disco is running",
+    help="The Disco to use",
 )
-def projects_list(disco_domain: str | None) -> None:
-    disco_domain_config = config.get_disco_domain(disco_domain)
-    disco_domain = disco_domain_config["domain"]
+def projects_list(disco: str | None) -> None:
+    disco_config = config.get_disco(disco)
     click.echo(f"Listing projects")
-    url = f"https://{disco_domain}/projects"
+    url = f"https://{disco_config['host']}/.disco/projects"
     response = requests.get(url,
-        auth=(disco_domain_config["apiKey"], ""),
+        auth=(disco_config["apiKey"], ""),
         headers={"Accept": "application/json"},
+        verify=config.requests_verify(disco_config),
     )
     if response.status_code != 200:
         click.echo("Error")

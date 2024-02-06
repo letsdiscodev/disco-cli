@@ -8,9 +8,9 @@ from discocli import config
 
 @click.command(name="deploy")
 @click.option(
-    "--name",
+    "--project",
     required=True,
-    help="the name that you'll use to refer to the project",
+    help="the project name",
 )
 @click.option(
     "--commit",
@@ -23,38 +23,39 @@ from discocli import config
     help="the JSON file to deploy",
 )
 @click.option(
-    "--disco-domain",
+    "--disco",
     required=False,
-    help="The domain where Disco is running",
+    help="The Disco to use",
 )
-def deploy(name: str, commit: str, file: str, disco_domain: str | None) -> None:
-    disco_domain_config = config.get_disco_domain(disco_domain)
-    disco_domain = disco_domain_config["domain"]
-    click.echo(f"Deploying {name}")
-    url = f"https://{disco_domain}/projects/{name}/deployments"
-    disco_config = None
+def deploy(project: str, commit: str, file: str, disco: str | None) -> None:
+    disco_config = config.get_disco(disco)
+    click.echo(f"Deploying {project}")
+    url = f"https://{disco_config['host']}/.disco/projects/{project}/deployments"
+    disco_file = None
     if file is not None:
         with open(file, "r", encoding="utf-8") as f:
-            disco_config = f.read()
+            disco_file = f.read()
     req_body = dict(
         commit=commit,
-        discoConfig=disco_config,
+        discoConfig=disco_file,
     )
     response = requests.post(url,
         json=req_body,
-        auth=(disco_domain_config["apiKey"], ""),
+        auth=(disco_config["apiKey"], ""),
         headers={"Accept": "application/json"},
+        verify=config.requests_verify(disco_config),
     )
     if response.status_code != 201:
         click.echo("Error")
         click.echo(response.text)
     resp_body = response.json()
-    click.echo(f"Deploying {name}, version {resp_body['deployment']['number']}")
-    url = f"https://{disco_domain}/projects/{name}/deployments/{resp_body['deployment']['number']}/output"
+    click.echo(f"Deploying {project}, version {resp_body['deployment']['number']}")
+    url = f"https://{disco_config['host']}/.disco/projects/{project}/deployments/{resp_body['deployment']['number']}/output"
     response = requests.get(url,
-        auth=(disco_domain_config["apiKey"], ""),
+        auth=(disco_config["apiKey"], ""),
         headers={'Accept': 'text/event-stream'},
         stream=True,
+        verify=config.requests_verify(disco_config),
     )
     for event in sseclient.SSEClient(response).events():
         output = json.loads(event.data)

@@ -5,30 +5,30 @@ from discocli import config
 
 @click.command(name="env:unset")
 @click.option(
-    "--name",
+    "--project",
     required=True,
-    help="the name that you'll use to refer to the project",
+    help="the project name",
 )
 @click.option(
-    "--disco-domain",
+    "--disco",
     required=False,
-    help="The domain where Disco is running",
+    help="The Disco to use",
 )
 @click.argument(
     "variable",
 )
-def env_var_delete(name: str, disco_domain: str | None, variable: str) -> None:
-    disco_domain_config = config.get_disco_domain(disco_domain)
-    disco_domain = disco_domain_config["domain"]
-    click.echo(f"Deploying {name}")
-    url = f"https://{disco_domain}/projects/{name}/env/{variable}"
+def env_var_delete(project: str, disco: str | None, variable: str) -> None:
+    disco_config = config.get_disco(disco)
+    click.echo(f"Deploying {project}")
+    url = f"https://{disco_config['host']}/.disco/projects/{project}/env/{variable}"
     response = requests.delete(url,
-        auth=(disco_domain_config["apiKey"], ""),
+        auth=(disco_config["apiKey"], ""),
         headers={"Accept": "application/json"},
+        verify=config.requests_verify(disco_config),
     )
     if response.status_code != [204, 404]:
         click.echo("Error")
         click.echo(response.text)
         return
     resp_body = response.json()
-    click.echo(f"Deployed {name}, version {resp_body['deployment']['number']}")
+    click.echo(f"Deployed {project}, version {resp_body['deployment']['number']}")

@@ -5,23 +5,23 @@ from discocli import config
 
 @click.command(name="env:list")
 @click.option(
-    "--name",
+    "--project",
     required=True,
-    help="the name that you'll use to refer to the project",
+    help="the project name",
 )
 @click.option(
-    "--disco-domain",
+    "--disco",
     required=False,
-    help="The domain where Disco is running",
+    help="The Disco to use",
 )
-def env_var_list(name: str, disco_domain: str | None) -> None:
-    disco_domain_config = config.get_disco_domain(disco_domain)
-    disco_domain = disco_domain_config["domain"]
-    click.echo(f"Fetching env variables for {name}")
-    url = f"https://{disco_domain}/projects/{name}/env"
+def env_var_list(project: str, disco: str | None) -> None:
+    disco_config = config.get_disco(disco)
+    click.echo(f"Fetching env variables for {project}")
+    url = f"https://{disco_config['host']}/.disco/projects/{project}/env"
     response = requests.get(url,
-        auth=(disco_domain_config["apiKey"], ""),
+        auth=(disco_config["apiKey"], ""),
         headers={"Accept": "application/json"},
+        verify=config.requests_verify(disco_config),
     )
     if response.status_code == 404:
         click.echo("")

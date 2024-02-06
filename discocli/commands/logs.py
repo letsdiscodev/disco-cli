@@ -17,24 +17,24 @@ from discocli import config
     help="The service you want to get logs about",
 )
 @click.option(
-    "--disco-domain",
+    "--disco",
     required=False,
-    help="The domain where Disco is running",
+    help="The Disco to use",
 )
-def logs(disco_domain: str | None, project: str | None, service: str | None) -> None:
-    disco_domain_config = config.get_disco_domain(disco_domain)
-    disco_domain = disco_domain_config["domain"]
+def logs(disco: str | None, project: str | None, service: str | None) -> None:
+    disco_config = config.get_disco(disco)
     if project is None and service is not None:
         raise Exception("Must specify project when specifying service")
-    url = f"https://{disco_domain}/logs"
+    url = f"https://{disco_config['host']}/.disco/logs"
     if project is not None:
         url = f"{url}/{project}" 
     if service is not None:
         url = f"{url}/{service}" 
     response = requests.get(url,
-        auth=(disco_domain_config["apiKey"], ""),
+        auth=(disco_config["apiKey"], ""),
         headers={'Accept': 'text/event-stream'},
         stream=True,
+        verify=config.requests_verify(disco_config),
     )
     for event in sseclient.SSEClient(response).events():
         log_item = json.loads(event.data)

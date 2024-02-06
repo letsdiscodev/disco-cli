@@ -1,30 +1,34 @@
 import re
 import subprocess
+import socket
 
 import click
 
-from discocli.config import set_api_key
+from discocli.config import add_disco
 
-INIT_SCRIPT_URL = "https://downloads.letsdisco.dev/latest/init"
+INIT_SCRIPT_URL = "https://downloads.letsdisco.dev/{version}/init"
 
 
 @click.command()
-@click.option(
-    "--ssh",
+@click.argument(
+    "ssh",
     required=True,
-    help="user@host, e.g. root@123.123.123.123",
 )
 @click.option(
-    "--disco-domain",
-    required=True,
-    help="domain name where disco will be served, e.g. disco.example.com",
+    "--version",
+    required=False,
+    help="The version to install",
 )
-def init(ssh: str, disco_domain: str) -> None:
+def init(ssh: str, version: str | None) -> None:
+    if version is None:
+        version = "latest"
+    init_script_url = INIT_SCRIPT_URL.format(version=version)
     click.echo(f"Installing Disco on {ssh}")
-    _, disco_ip = ssh.split("@")
+    _, host = ssh.split("@")
+    ip = socket.gethostbyname(host)
     command = (
-        f"curl {INIT_SCRIPT_URL} | "
-        f"sudo DISCO_DOMAIN={disco_domain} DISCO_IP={disco_ip} sh"
+        f"curl {init_script_url} | "
+        f"sudo DISCO_IP={ip} sh"
     )
     success, output = _ssh_command(connection_str=ssh, command=command)
     if not success:
@@ -32,7 +36,8 @@ def init(ssh: str, disco_domain: str) -> None:
         return
     else:
         api_key = _extract_api_key(output)
-        set_api_key(disco_domain=disco_domain, api_key=api_key)
+        public_key = _extract_ca_public_key(output)
+        add_disco(name=host, host=host, ip=ip, api_key=api_key, public_key=public_key)
         click.echo("Success")
         return
 
@@ -60,3 +65,12 @@ def _extract_api_key(output: str) -> str:
     match = re.search(r"Created API key: (?P<api_key>[a-z0-9]{32})", output)
     api_key = match.group("api_key")
     return api_key
+
+def _extract_ca_public_key(output: str) -> str:
+    match = re.search(
+        "-----BEGIN CERTIFICATE-----\n.*\n-----END CERTIFICATE-----", 
+        output,
+        re.DOTALL,
+    )
+    public_key = match.group(0)
+    return public_key

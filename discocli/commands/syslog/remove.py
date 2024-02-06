@@ -5,26 +5,26 @@ from discocli import config
 
 @click.command(name="syslog:remove")
 @click.option(
-    "--disco-domain",
+    "--disco",
     required=False,
-    help="The domain where Disco is running",
+    help="The Disco to use",
 )
 @click.argument(
     "url",
 )
-def syslog_remove(url: str, disco_domain: str | None) -> None:
-    disco_domain_config = config.get_disco_domain(disco_domain)
-    disco_domain = disco_domain_config["domain"]
+def syslog_remove(url: str, host: str | None) -> None:
+    disco_config = config.get_disco(host)
     click.echo(f"Removing Syslog URL")
-    request_url = f"https://{disco_domain}/syslog"
+    request_url = f"https://{disco_config['host']}/.disco/syslog"
     req_body = dict(
         action="remove",
         url=url,
     )
     response = requests.post(request_url,
         json=req_body,
-        auth=(disco_domain_config["apiKey"], ""),
+        auth=(disco_config["apiKey"], ""),
         headers={"Accept": "application/json"},
+        verify=config.requests_verify(disco_config),
     )
     if response.status_code != 200:
         click.echo("Error")

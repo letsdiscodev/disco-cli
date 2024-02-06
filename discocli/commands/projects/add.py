@@ -7,7 +7,7 @@ from discocli import config
 @click.option(
     "--name",
     required=True,
-    help="the name that you'll use to refer to the project",
+    help="the project name",
 )
 @click.option(
     "--domain",
@@ -20,15 +20,14 @@ from discocli import config
     help="URL used to clone the repo, e.g. git@github.com:example/example.git",
 )
 @click.option(
-    "--disco-domain",
+    "--disco",
     required=False,
-    help="The domain where Disco is running",
+    help="The Disco to use",
 )
-def projects_add(name: str, domain: str, github_repo: str, disco_domain: str | None) -> None:
-    disco_domain_config = config.get_disco_domain(disco_domain)
-    disco_domain = disco_domain_config["domain"]
+def projects_add(name: str, domain: str, github_repo: str, disco: str | None) -> None:
+    disco_config = config.get_disco(disco)
     click.echo(f"Adding project")
-    url = f"https://{disco_domain}/projects"
+    url = f"https://{disco_config['host']}/.disco/projects"
     req_body = dict(
         name=name,
         githubRepo=github_repo,
@@ -36,16 +35,27 @@ def projects_add(name: str, domain: str, github_repo: str, disco_domain: str | N
     )
     response = requests.post(url,
         json=req_body,
-        auth=(disco_domain_config["apiKey"], ""),
+        auth=(disco_config["apiKey"], ""),
         headers={"Accept": "application/json"},
+        verify=config.requests_verify(disco_config),
     )
     if response.status_code != 201:
         click.echo("Error")
         click.echo(response.text)
     resp_body = response.json()
-    click.echo("Create a Deploy Key on Github with this:")
-    click.echo(resp_body["sshKeyPub"])
-    click.echo("")
-    click.echo("Then add a Github webhook for pushes to that URL, "
-               "with 'Content-Type: application/json':")
-    click.echo(f"https://{disco_domain}/webhooks/github/{resp_body['project']['id']}")
+    if resp_body["sshKeyPub"] is not None:
+        click.echo("Create a Deploy Key on Github with this:")
+        click.echo(resp_body["sshKeyPub"])
+        click.echo("")
+    if resp_body["project"]["githubRepo"] is not None:
+        webhook_host = resp_body["project"]["domain"]
+        if webhook_host is None:
+            webhook_host = disco_config['host']
+        click.echo(
+            "Then add a Github webhook for pushes to that URL, "
+            "with 'Content-Type: application/json':"
+        )
+        click.echo(
+            f"https://{webhook_host}"
+            f"/.disco/webhooks/github/{resp_body['project']['id']}"
+        )
