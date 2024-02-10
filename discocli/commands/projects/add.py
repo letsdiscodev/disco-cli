@@ -1,3 +1,4 @@
+import re
 import click
 import requests
 
@@ -26,7 +27,7 @@ from discocli import config
 )
 def projects_add(name: str, domain: str, github_repo: str, disco: str | None) -> None:
     disco_config = config.get_disco(disco)
-    click.echo(f"Adding project")
+    click.echo(f"Adding project...")
     url = f"https://{disco_config['host']}/.disco/projects"
     req_body = dict(
         name=name,
@@ -43,19 +44,42 @@ def projects_add(name: str, domain: str, github_repo: str, disco: str | None) ->
         click.echo("Error")
         click.echo(response.text)
     resp_body = response.json()
-    if resp_body["sshKeyPub"] is not None:
-        click.echo("Create a Deploy Key on Github with this:")
-        click.echo(resp_body["sshKeyPub"])
-        click.echo("")
+    click.echo("Project added.")
+    click.echo("")
     if resp_body["project"]["githubRepo"] is not None:
+        m = re.match(r"git@github\.com:(?P<repo>\S+)\.git", resp_body["project"]["githubRepo"])
+        repo = m.group("repo")
+        click.echo("")
+        click.echo("Github Deploy Key")
+        click.echo("=================")
+        click.echo("")
+        click.echo("You need to give read access to your repo to Disco.")
+        click.echo(f"Open https://github.com/{repo}/settings/keys/new")
+        click.echo("")
+        click.echo('Title: Give it the title you want, for example: "Disco".')
+        click.echo("")
+        click.echo("Key:")
+        click.echo(resp_body["sshKeyPub"])
+        click.echo("No need for write access.")
+        click.echo("")
         webhook_host = resp_body["project"]["domain"]
         if webhook_host is None:
             webhook_host = disco_config['host']
-        click.echo(
-            "Then add a Github webhook for pushes to that URL, "
-            "with 'Content-Type: application/json':"
-        )
+        click.echo("")
+        click.echo("Github Webhook")
+        click.echo("==============")
+        click.echo("")
+        click.echo("To deploy automatically when commits are pushed.")
+        click.echo(f"Open https://github.com/{repo}/settings/hooks/new")
+        click.echo("")
+        click.echo("Payload URL")
         click.echo(
             f"https://{webhook_host}"
-            f"/.disco/webhooks/github/{resp_body['project']['id']}"
+            f"/.disco/webhooks/github/{resp_body['project']['githubWebhookToken']}"
         )
+        click.echo("")
+        click.echo("SSL verification: Enable SSL verification")
+        click.echo("Content type: application/json")
+        click.echo("Secret: leave empty.")
+        click.echo("Just the push event.")
+        click.echo('Check "Active".')
