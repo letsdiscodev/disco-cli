@@ -17,9 +17,9 @@ from discocli import config
 @click.argument(
     "variable",
 )
-def env_var_delete(project: str, disco: str | None, variable: str) -> None:
+def env_var_remove(project: str, disco: str | None, variable: str) -> None:
     disco_config = config.get_disco(disco)
-    click.echo(f"Deploying {project}")
+    click.echo(f"Removing env variable from {project}")
     url = f"https://{disco_config['host']}/.disco/projects/{project}/env/{variable}"
     response = requests.delete(url,
         auth=(disco_config["apiKey"], ""),
@@ -30,5 +30,5 @@ def env_var_delete(project: str, disco: str | None, variable: str) -> None:
         click.echo("Error")
         click.echo(response.text)
         return
-    resp_body = response.json()
-    click.echo(f"Deployed {project}, version {resp_body['deployment']['number']}")
+    # TODO some confirmation output
+    # TODO if deployment is not None, follow deployment

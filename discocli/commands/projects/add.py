@@ -45,8 +45,8 @@ def projects_add(name: str, domain: str, github_repo: str, disco: str | None) ->
         click.echo(response.text)
     resp_body = response.json()
     click.echo("Project added.")
-    click.echo("")
     if resp_body["project"]["githubRepo"] is not None:
+        click.echo("")
         m = re.match(r"git@github\.com:(?P<repo>\S+)\.git", resp_body["project"]["githubRepo"])
         repo = m.group("repo")
         click.echo("")

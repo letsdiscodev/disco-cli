@@ -1,26 +1,29 @@
+import re
 import click
 import requests
 
 from discocli import config
 
-@click.command(name="projects:list")
+@click.command(name="projects:remove")
 @click.option(
     "--disco",
     required=False,
     help="The Disco to use",
 )
-def projects_list(disco: str | None) -> None:
+@click.argument(
+    "project",
+)
+def projects_remove(project: str, disco: str | None) -> None:
     disco_config = config.get_disco(disco)
-    url = f"https://{disco_config['host']}/.disco/projects"
-    response = requests.get(url,
+    click.echo(f"Removing project...")
+    url = f"https://{disco_config['host']}/.disco/projects/{project}"
+    response = requests.delete(url,
         auth=(disco_config["apiKey"], ""),
         headers={"Accept": "application/json"},
         verify=config.requests_verify(disco_config),
     )
-    if response.status_code != 200:
+    if response.status_code not in [200, 204]:
         click.echo("Error")
         click.echo(response.text)
-        return
-    resp_body = response.json()
-    for project in resp_body["projects"]:
-        click.echo(project["name"])
+    else:
+        click.echo("Project removed.")

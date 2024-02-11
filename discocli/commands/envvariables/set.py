@@ -46,5 +46,4 @@ def env_var_set(project: str, disco: str | None, variables: list[str]) -> None:
         return
     resp_body = response.json()
     click.echo("Set")
-    if resp_body["deployment"] is not None:
-        click.echo(f"Deployed {project}, version {resp_body['deployment']['number']}")
+    # TODO if deployment is not None, follow deployment
