@@ -37,7 +37,7 @@ def deploy(project: str, commit: str, file: str, disco: str | None) -> None:
             disco_file = f.read()
     req_body = dict(
         commit=commit,
-        discoConfig=disco_file,
+        discoFile=disco_file,
     )
     response = requests.post(url,
         json=req_body,
