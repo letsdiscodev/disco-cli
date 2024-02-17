@@ -21,6 +21,7 @@ def syslog_list(disco: str | None) -> None:
     if response.status_code != 200:
         click.echo("Error")
         click.echo(response.text)
+        return
     resp_body = response.json()
     if len(resp_body["urls"]) > 0:
         click.echo("Current Syslog URLs:")

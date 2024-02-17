@@ -43,6 +43,7 @@ def projects_add(name: str, domain: str, github_repo: str, disco: str | None) ->
     if response.status_code != 201:
         click.echo("Error")
         click.echo(response.text)
+        return
     resp_body = response.json()
     click.echo("Project added.")
     if resp_body["project"]["githubRepo"] is not None:

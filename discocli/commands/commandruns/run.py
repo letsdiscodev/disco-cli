@@ -6,38 +6,39 @@ import sseclient
 
 from discocli import config
 
-@click.command(name="deploy")
+@click.command(name="run")
 @click.option(
     "--project",
     required=True,
     help="the project name",
 )
 @click.option(
-    "--commit",
+    "--service",
     required=False,
-    help="the commit to deploy, e.g. 7b5c8f935328c1af49c9037cac9dee7bf0bd8c7e",
+    help="The service you want to use to run the command",
 )
 @click.option(
-    "--file",
+    "--timeout",
     required=False,
-    help="the JSON file to deploy",
+    help="The timeout in seconds for the command before it's killed",
+    default=600,
 )
 @click.option(
     "--disco",
     required=False,
     help="The Disco to use",
 )
-def deploy(project: str, commit: str, file: str, disco: str | None) -> None:
+@click.argument(
+    "command",
+)
+def run(project: str, service: str, command: str, timeout: int, disco: str | None) -> None:
     disco_config = config.get_disco(disco)
-    click.echo(f"Deploying {project}")
-    url = f"https://{disco_config['host']}/.disco/projects/{project}/deployments"
-    disco_file = None
-    if file is not None:
-        with open(file, "r", encoding="utf-8") as f:
-            disco_file = f.read()
+    click.echo(f"Running command...")
+    url = f"https://{disco_config['host']}/.disco/projects/{project}/runs"
     req_body = dict(
-        commit=commit,
-        discoFile=disco_file,
+        command=command,
+        service=service,
+        timeout=timeout,
     )
     response = requests.post(url,
         json=req_body,
@@ -45,13 +46,12 @@ def deploy(project: str, commit: str, file: str, disco: str | None) -> None:
         headers={"Accept": "application/json"},
         verify=config.requests_verify(disco_config),
     )
-    if response.status_code != 201:
+    if response.status_code != 202:
         click.echo("Error")
         click.echo(response.text)
         return
     resp_body = response.json()
-    click.echo(f"Deploying {project}, version {resp_body['deployment']['number']}")
-    url = f"https://{disco_config['host']}/.disco/projects/{project}/deployments/{resp_body['deployment']['number']}/output"
+    url = f"https://{disco_config['host']}/.disco/projects/{project}/runs/{resp_body['run']['number']}/output"
     response = requests.get(url,
         auth=(disco_config["apiKey"], ""),
         headers={'Accept': 'text/event-stream'},

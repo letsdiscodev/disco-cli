@@ -29,6 +29,7 @@ def syslog_add(url: str, disco: str | None) -> None:
     if response.status_code != 200:
         click.echo("Error")
         click.echo(response.text)
+        return
     resp_body = response.json()
     click.echo("Added.")
     if len(resp_body["urls"]) > 0:

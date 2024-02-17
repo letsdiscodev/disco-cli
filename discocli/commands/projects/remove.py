@@ -25,5 +25,5 @@ def projects_remove(project: str, disco: str | None) -> None:
     if response.status_code not in [200, 204]:
         click.echo("Error")
         click.echo(response.text)
-    else:
-        click.echo("Project removed.")
+        return
+    click.echo("Project removed.")
