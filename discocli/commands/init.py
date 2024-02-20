@@ -28,7 +28,7 @@ def init(ssh: str, version: str | None) -> None:
     ip = socket.gethostbyname(host)
     command = (
         f"curl {init_script_url} | "
-        f"sudo DISCO_IP={ip} sh"
+        f"sudo DISCO_IP={ip} DISCO_VERBOSE='false' sh"
     )
     success, output = _ssh_command(connection_str=ssh, command=command)
     if not success:
