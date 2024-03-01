@@ -19,7 +19,7 @@ from discocli import config
 )
 def env_var_get(project: str, disco: str | None, variable: str) -> None:
     disco_config = config.get_disco(disco)
-    click.echo(f"Fetching env variable for {project}: {variable}")
+    click.echo(f"Fetching env variable for {project}: {variable}", err=True)
     url = f"https://{disco_config['host']}/.disco/projects/{project}/env/{variable}"
     response = requests.get(url,
         auth=(disco_config["apiKey"], ""),
