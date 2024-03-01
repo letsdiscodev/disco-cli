@@ -7,16 +7,11 @@ import sseclient
 from discocli import config
 
 
-@click.command(name="run")
-@click.option(
-    "--project",
-    required=True,
-    help="the project name",
-)
-@click.option(
-    "--service",
-    required=False,
-    help="The service you want to use to run the command",
+@click.command(
+    name="command",
+    context_settings=dict(
+        ignore_unknown_options=True,
+    ),
 )
 @click.option(
     "--timeout",
@@ -30,17 +25,24 @@ from discocli import config
     help="The Disco to use",
 )
 @click.argument(
+    "project",
+)
+@click.argument(
     "command",
 )
-def run(
-    project: str, service: str, command: str, timeout: int, disco: str | None
+@click.argument(
+    "args",
+    nargs=-1,
+)
+def command(
+    project: str, command: str, args: str, timeout: int, disco: str | None
 ) -> None:
     disco_config = config.get_disco(disco)
     click.echo(f"Running command...")
     url = f"https://{disco_config['host']}/.disco/projects/{project}/runs"
     req_body = dict(
-        command=command,
-        service=service,
+        command=" ".join(args),
+        service=command,
         timeout=timeout,
     )
     response = requests.post(
