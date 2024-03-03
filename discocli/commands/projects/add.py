@@ -62,7 +62,7 @@ def projects_add(
     if resp_body["project"]["githubRepo"] is not None:
         click.echo("")
         m = re.match(
-            r"^((git@)|(https://))github\.com:(?P<repo>\S+)\.git$",
+            r"^((git@)|(https://))github\.com(:|/)(?P<repo>\S+)\.git$",
             resp_body["project"]["githubRepo"],
         )
         if m is not None:
