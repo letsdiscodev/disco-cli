@@ -78,6 +78,17 @@ disco logs --project first-project
 disco syslog:add syslog+tls://logsN.papertrailapp.com:12345
 ```
 
+#### List deployments for a project
+
+```bash
+disco deploy:list --project first-project
+```
+
+#### Get output of a specific deployment
+```bash
+disco deploy:output --project first-project --deployment 123
+```
+
 ## Local development of the CLI
 
 Install the package locally in a virtualenv.

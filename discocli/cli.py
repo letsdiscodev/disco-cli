@@ -5,6 +5,8 @@ from discocli.commands.projects.add import projects_add
 from discocli.commands.projects.list import projects_list
 from discocli.commands.projects.remove import projects_remove
 from discocli.commands.deployments.deploy import deploy
+from discocli.commands.deployments.list import deploy_list
+from discocli.commands.deployments.output import deploy_output
 from discocli.commands.commandruns.run import run
 from discocli.commands.commandruns.command import command
 from discocli.commands.envvariables.set import env_var_set
@@ -31,6 +33,8 @@ main.add_command(projects_add)
 main.add_command(projects_remove)
 main.add_command(projects_list)
 main.add_command(deploy)
+main.add_command(deploy_list)
+main.add_command(deploy_output)
 main.add_command(run)
 main.add_command(env_var_set)
 main.add_command(env_var_get)
