@@ -1,6 +1,8 @@
 import click
 
 from discocli.commands.init import init
+from discocli.commands.meta.info import meta_info
+from discocli.commands.meta.upgrade import meta_upgrade
 from discocli.commands.projects.add import projects_add
 from discocli.commands.projects.list import projects_list
 from discocli.commands.projects.remove import projects_remove
@@ -29,6 +31,8 @@ def main() -> None:
 
 
 main.add_command(init)
+main.add_command(meta_info)
+main.add_command(meta_upgrade)
 main.add_command(projects_add)
 main.add_command(projects_remove)
 main.add_command(projects_list)
