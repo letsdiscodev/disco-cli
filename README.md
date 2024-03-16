@@ -31,7 +31,7 @@ Follow the instructions from the output above for the deployment key and webhook
 
 #### Add a database to the project
 ```bash
-disco command postgres db:add first-project
+disco command postgres db:add --project first-project
 ```
 This should have set the env variable `DATABASE_URL` for `first-project`.
 
