@@ -15,7 +15,7 @@ disco init root@123.123.123.123
 ```bash
 disco projects:add \
     --name postgres \
-    --github-repo https://github.com/letsdiscodev/disco-addon-postgres.git\
+    --github-repo https://github.com/letsdiscodev/disco-addon-postgres \
     --deploy
 ```
 
