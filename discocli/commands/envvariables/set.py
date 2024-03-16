@@ -1,5 +1,8 @@
+import json
+
 import click
 import requests
+import sseclient
 
 from discocli import config
 
@@ -22,18 +25,18 @@ def env_var_set(project: str, disco: str | None, variables: list[str]) -> None:
     disco_config = config.get_disco(disco)
     click.echo(f"Setting env variable for {project}")
     url = f"https://{disco_config['host']}/.disco/projects/{project}/env"
-    req_body = dict(
-        envVariables=[],
-    )
+    req_body = {
+        "envVariables": [],
+    }
     for variable in variables:
         parts = variable.split("=")
-        project = parts[0]
+        var_name = parts[0]
         value = "=".join(parts[1:])
         if value[0] == value[-1]:
             if value[0] in ["'", '"']:
                 # remove quotes if any
                 value = value[1:-1]
-        req_body["envVariables"].append(dict(name=parts[0], value=value))
+        req_body["envVariables"].append(dict(name=var_name, value=value))
     response = requests.post(url,
         json=req_body,
         auth=(disco_config["apiKey"], ""),
@@ -45,5 +48,16 @@ def env_var_set(project: str, disco: str | None, variables: list[str]) -> None:
         click.echo(response.text)
         return
     resp_body = response.json()
-    click.echo("Set")
-    # TODO if deployment is not None, follow deployment
+    if resp_body["deployment"] is not None:
+        click.echo(f"Deploying {project}, version {resp_body['deployment']['number']}")
+        url = f"https://{disco_config['host']}/.disco/projects/{project}/deployments/{resp_body['deployment']['number']}/output"
+        response = requests.get(
+            url,
+            auth=(disco_config["apiKey"], ""),
+            headers={"Accept": "text/event-stream"},
+            stream=True,
+            verify=config.requests_verify(disco_config),
+        )
+        for event in sseclient.SSEClient(response).events():
+            output = json.loads(event.data)
+            click.echo(output["text"], nl=False)
