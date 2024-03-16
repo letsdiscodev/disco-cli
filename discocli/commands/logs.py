@@ -36,6 +36,9 @@ def logs(disco: str | None, project: str | None, service: str | None) -> None:
         stream=True,
         verify=config.requests_verify(disco_config),
     )
+    if response.status_code == 404:
+        click.echo("Not found")
+        return
     for event in sseclient.SSEClient(response).events():
         log_item = json.loads(event.data)
         if "com.docker.swarm.service.name" not in log_item["labels"]:
