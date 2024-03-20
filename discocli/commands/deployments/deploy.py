@@ -32,7 +32,6 @@ def deploy(
     project: str, commit: str | None, file: str | None, disco: str | None
 ) -> None:
     disco_config = config.get_disco(disco)
-    click.echo(f"Deploying {project}")
     url = f"https://{disco_config['host']}/.disco/projects/{project}/deployments"
     disco_file = None
     if file is not None:
@@ -55,7 +54,6 @@ def deploy(
         click.echo(response.text)
         return
     resp_body = response.json()
-    click.echo(f"Deploying {project}, version {resp_body['deployment']['number']}")
     url = f"https://{disco_config['host']}/.disco/projects/{project}/deployments/{resp_body['deployment']['number']}/output"
     response = requests.get(
         url,

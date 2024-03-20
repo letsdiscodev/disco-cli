@@ -36,7 +36,6 @@ def run(
     project: str, service: str, command: str, timeout: int, disco: str | None
 ) -> None:
     disco_config = config.get_disco(disco)
-    click.echo(f"Running command...")
     url = f"https://{disco_config['host']}/.disco/projects/{project}/runs"
     req_body = dict(
         command=command,
