@@ -23,7 +23,6 @@ from discocli import config
 )
 def env_var_set(project: str, disco: str | None, variables: list[str]) -> None:
     disco_config = config.get_disco(disco)
-    click.echo(f"Setting env variable for {project}")
     url = f"https://{disco_config['host']}/.disco/projects/{project}/env"
     req_body = {
         "envVariables": [],
@@ -49,7 +48,6 @@ def env_var_set(project: str, disco: str | None, variables: list[str]) -> None:
         return
     resp_body = response.json()
     if resp_body["deployment"] is not None:
-        click.echo(f"Deploying {project}, version {resp_body['deployment']['number']}")
         url = f"https://{disco_config['host']}/.disco/projects/{project}/deployments/{resp_body['deployment']['number']}/output"
         response = requests.get(
             url,

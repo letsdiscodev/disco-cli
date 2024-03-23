@@ -54,6 +54,7 @@ def _ssh_command(connection_str: str, command: str) -> tuple[bool, str]:
         stderr=subprocess.STDOUT,
     )
     output = ""
+    assert process.stdout is not None
     for line in process.stdout:
         print(line.decode("utf-8"), end="")
         output += line.decode("utf-8")
