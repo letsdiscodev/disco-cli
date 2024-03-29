@@ -1,5 +1,11 @@
 # Disco CLI
 
+---
+
+[See our documentation here](https://docs.letsdisco.dev/)!
+
+---
+
 ## Usage
 
 ### Install Disco on a Ubuntu 23.10 server with first project
