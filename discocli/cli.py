@@ -26,6 +26,10 @@ from discocli.commands.syslog.remove import syslog_remove
 from discocli.commands.syslog.list import syslog_list
 from discocli.commands.nodes.add import nodes_add
 from discocli.commands.scale.scale import scale
+from discocli.commands.invites.create import invite_create
+from discocli.commands.invites.accept import invite_accept
+from discocli.commands.apikeys.list import apikeys_list
+from discocli.commands.apikeys.remove import apikeys_remove
 
 
 @click.group()
@@ -63,3 +67,8 @@ main.add_command(syslog_list)
 main.add_command(command)
 main.add_command(nodes_add)
 main.add_command(scale)
+main.add_command(invite_create)
+main.add_command(invite_accept)
+main.add_command(apikeys_list)
+main.add_command(apikeys_remove)
+

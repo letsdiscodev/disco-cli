@@ -17,11 +17,11 @@ def add_disco(
     host: str,
     ip: str,
     api_key: str,
-    public_key: str,
+    public_key: str | None = None,
 ) -> None:
     config = _get_config()
     if name in config["discos"]:
-        raise Exception("Disco {name} already in config")
+        raise Exception(f"Disco {name} already in config")
     config["discos"][name] = {
         "name": name,
         "host": host,
@@ -29,8 +29,13 @@ def add_disco(
         "apiKey": api_key,
     }
     _save_config(config)
-    _write_cert(ip, public_key)
+    if public_key is not None:
+        _write_cert(ip, public_key)
 
+
+def disco_already_in_config(name: str) -> bool:
+    config = _get_config()
+    return name in list(config["discos"].keys())
 
 def get_disco(name: str | None) -> dict[str, Any]:
     config = _get_config()

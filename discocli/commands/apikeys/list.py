@@ -3,26 +3,16 @@ import requests
 
 from discocli import config
 
-
-@click.command(name="meta:host")
+@click.command(name="apikeys:list")
 @click.option(
     "--disco",
     required=False,
     help="The Disco to use",
 )
-@click.argument(
-    "domain",
-    required=True,
-)
-def meta_host(domain: str, disco: str | None) -> None:
+def apikeys_list(disco: str | None) -> None:
     disco_config = config.get_disco(disco)
-    url = f"https://{disco_config['host']}/.disco/disco/host"
-    req_body = dict(
-        host=domain,
-    )
-    response = requests.post(
-        url,
-        json=req_body,
+    url = f"https://{disco_config['host']}/.disco/api-keys"
+    response = requests.get(url,
         auth=(disco_config["apiKey"], ""),
         headers={"Accept": "application/json"},
         verify=config.requests_verify(disco_config),
@@ -32,4 +22,6 @@ def meta_host(domain: str, disco: str | None) -> None:
         click.echo(response.text)
         return
     resp_body = response.json()
-    config.set_host(name=disco_config["name"], host=resp_body["discoHost"])
+    click.echo("Public                           Private                          Name")
+    for api_key in resp_body["apiKeys"]:
+        click.echo(f"{api_key['publicKey']} {api_key['privateKey']} {api_key['name']}")
