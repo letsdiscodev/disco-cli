@@ -39,5 +39,8 @@ def deploy_output(
         click.echo("No deployment found")
         return
     for event in sseclient.SSEClient(response).events():
-        output = json.loads(event.data)
-        click.echo(output["text"], nl=False)
+        if event.event == "output":
+            output = json.loads(event.data)
+            click.echo(output["text"], nl=False)
+        elif event.event == "end":
+            break

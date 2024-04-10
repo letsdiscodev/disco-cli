@@ -75,5 +75,8 @@ def projects_move(project: str, from_disco: str, to_disco) -> None:
             verify=config.requests_verify(to_disco_config),
         )
         for event in sseclient.SSEClient(response).events():
-            output = json.loads(event.data)
-            click.echo(output["text"], nl=False)
+            if event.event == "output":
+                output = json.loads(event.data)
+                click.echo(output["text"], nl=False)
+            elif event.event == "end":
+                break

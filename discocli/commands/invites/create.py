@@ -1,8 +1,6 @@
 import re
 import click
 import requests
-import sseclient
-import json
 
 from discocli import config
 
