@@ -41,8 +41,6 @@ def logs(disco: str | None, project: str | None, service: str | None) -> None:
         return
     for event in sseclient.SSEClient(response).events():
         log_item = json.loads(event.data)
-        if "com.docker.swarm.service.name" not in log_item["labels"]:
-            continue
         container = log_item["container"][1:]
         timestamp = log_item["timestamp"]
         message = log_item["message"]
